@@ -1,0 +1,28 @@
+# Project infromation
+project:
+  name: "Cancer Detection"
+  description: "DPL302m Project - Fall 2024 of Group 1"
+  version: "1.0.0"
+
+# Filesystem configuration
+data:
+  data_path: "data/"
+  csv_path: "data/HAM10000_metadata.csv"
+  images_path: "data/images/"
+
+# Hyperparameters
+hyperparameters:
+  epochs: 50
+  batch_size: 32
+  learning_rate: 0.001
+
+# Model configuration
+
+# Data augmentation
+
+# Hardware configuration
+
+# Logging configuration
+
+# Training configuration
+
