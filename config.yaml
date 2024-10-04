@@ -16,6 +16,11 @@ hyperparameters:
   batch_size: 32
   learning_rate: 0.001
 
+# Training configuration
+training:
+  n_workers: 16
+  batch_size: 32
+
 # Model configuration
 
 # Data augmentation
@@ -24,5 +29,4 @@ hyperparameters:
 
 # Logging configuration
 
-# Training configuration
 
