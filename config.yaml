@@ -19,7 +19,7 @@ hyperparameters:
 # Preprocessing configuration
 preprocessing:
   augmentation:
-    ratio: 2
+    ratio: 1
   resize: 224
   desired_total: 20000
 
