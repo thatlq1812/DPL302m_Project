@@ -20,7 +20,7 @@ hyperparameters:
 preprocessing:
   augmentation:
     ratio: 1
-  resize: 224
+  resize: !!seq [64, 64]
   desired_total: 20000
 
 
