@@ -2,6 +2,7 @@
 project:
   name: "Cancer Detection"
   description: "DPL302m Project - Fall 2024 of Group 1"
+  author: "Group 1"
   version: "1.0.0"
 
 # Filesystem configuration
