@@ -8,14 +8,25 @@ project:
 # Filesystem configuration
 data:
   data_path: "data/"
-  csv_path: "data/HAM10000_metadata.csv"
-  images_path: "data/images/"
+  raw_path: "data/raw/"
+  raw_csv_path: "data/raw/HAM10000_metadata.csv"
+  raw_images_path: "data/raw/images/"
+
+  processed_path: "data/processed/"
+  processed_csv_path: "data/processed/HAM10000_metadata.csv"
+  processed_images_path: "data/processed/images/"
+
+
+# Cần phân chia cả raw và preprocessed data ở đây ( ở trên)
 
 # Hyperparameters
 hyperparameters:
   epochs: 50
   batch_size: 32
   learning_rate: 0.001
+  test_size: 0.2
+  random_state: 42
+
 
 # Preprocessing configuration
 preprocessing:
@@ -26,13 +37,16 @@ preprocessing:
 
 
 # Training configuration
-training:
+
+processor:
   n_workers: 16
   batch_size: 32
   test_size: 0.2
   random_state: 42
   
-
+# Encoder location
+encoder:
+  path: "encoder/"
 
 # Model configuration
 
