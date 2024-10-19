@@ -1,2 +1,0 @@
-1. Import thư viện
-2. Đọc file csv, đọc file ảnh

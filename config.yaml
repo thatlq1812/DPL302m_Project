@@ -21,7 +21,7 @@ hyperparameters:
 preprocessing:
   augmentation:
     ratio: 1
-  resize: !!seq [64, 64]
+  resize: !!seq [224, 224]
   desired_total: 20000
 
 
@@ -42,4 +42,6 @@ training:
 
 # Logging configuration
 
-
+# Connect with GG Colab
+#http://localhost:8888/tree?token=a1b385127099649cebd63e1c4964b1c02c1585eb8238c667
+#http://127.0.0.1:8888/tree?token=a1b385127099649cebd63e1c4964b1c02c1585eb8238c667
