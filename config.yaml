@@ -13,7 +13,7 @@ data:
   raw_images_path: "data/raw/images/"
 
   processed_path: "data/processed/"
-  processed_csv_path: "data/processed/HAM10000_metadata.csv"
+  # processed_csv_path: "data/processed/HAM10000_metadata.csv"
   processed_images_path: "data/processed/images/"
 
 
@@ -26,13 +26,15 @@ hyperparameters:
   learning_rate: 0.001
   test_size: 0.2
   random_state: 42
+  num_classes: 7
+  feature_extract: False
 
 
 # Preprocessing configuration
 preprocessing:
   augmentation:
     ratio: 1
-  resize: !!seq [64, 64]
+  resize: !!seq [224, 224]
   desired_total: 20000
 
 

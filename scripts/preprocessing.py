@@ -9,7 +9,7 @@ import numpy as np
 import albumentations as A
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from torchvision import transforms
 
@@ -116,7 +116,7 @@ class DataProcessor:
     
     def drop_unnecessary_columns(self):
         """Drop unnecessary columns."""
-        self.data = self.data.drop(columns=['lesion_id', 'image_id', 'dx', 'dx_type', 'sex', 'localization']).astype(np.float32)
+        self.data = self.data.drop(columns=['dx', 'dx_type', 'sex', 'localization'])
         self.data.reset_index(drop=True, inplace=True)
 
     def split_data(self, test_size=0.2, random_state=42):
@@ -150,23 +150,23 @@ class DataProcessor:
         return all_images
     
     def type_count(self, data, rate):
-        lesion_type = data.groupby(data['dx']).count()
+        lesion_type = data.groupby(data['dx_code']).count()
         lesion_type = lesion_type.reset_index()
-        lesion_type = lesion_type[['dx', 'image_id']]
-        lesion_type.columns = ['dx', 'count']
+        lesion_type = lesion_type[['dx_code', 'image_id']]
+        lesion_type.columns = ['dx_code', 'count']
         lesion_type = lesion_type.sort_values(by='count', ascending=False)
         print(lesion_type)
         max_count = lesion_type['count'].max()
         augmentation_counts = {}
         for index, row in lesion_type.iterrows():
-            augmentation_counts[row['dx']] = int(max_count / row['count'] * rate)
+            augmentation_counts[row['dx_code']] = int(max_count / row['count'] * rate)
         return augmentation_counts
     
     def augment_image_worker(self, row, image, augmentations, augmentation_counts):
         augmented_images = []
         augmented_data = []
 
-        lesion_type = row['dx']
+        lesion_type = row['dx_code']
         count = augmentation_counts.get(lesion_type, 0)
         if count == 0:
             return None, None
@@ -272,9 +272,6 @@ class DataProcessor:
         norm_mean = torch.tensor(norm_mean)
         norm_std = torch.tensor(norm_std)
 
-        # Save the mean and standard deviation to a file
-        
-
         # Create file paths
         suffix = str(self.resize_shape[0]) + 'x' + str(self.resize_shape[1]) + '_' + file_suffix
         norm_file_path = os.path.join(self.config['data']['processed_path'], f"norm_mean_std{suffix}.pt")
@@ -304,6 +301,7 @@ class DataProcessor:
         augmentation_counts = self.type_count(train_data, self.config['preprocessing']['augmentation']['ratio'])
         augmented_train_data, augmented_train_images = self.augment_images(train_data, train_images, augmentation_counts)
         print('Augmented train data shape:', augmented_train_data.shape)
+        print('Augmented train images shape:', len(augmented_train_images))
         print('Raw test data shape:', test_data.shape)
         
         print("Saving data...")
