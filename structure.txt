@@ -92,3 +92,35 @@ Bước đầu: README.md, requirements.txt, notebooks/ để hiểu rõ project
 Bước tiếp theo: scripts/preprocess.py, models/model.py, models/train.py, và config.yaml để xây dựng và huấn luyện mô hình.
 Bước cuối: tests/, models/predict.py, setup.py để kiểm thử, triển khai và đóng gói mô hình.
 Thứ tự này đảm bảo quá trình phát triển có hệ thống, từ việc khám phá dữ liệu, xây dựng mô hình, huấn luyện, cho đến kiểm thử và triển khai. Nếu có bước nào cần hỗ trợ chi tiết hơn, bạn hãy cho mình biết nhé!
+
+
+
+
+
+Sau khi hoàn thành preprocessing.py, bạn có thể thực hiện các bước tiếp theo sau đây:
+
+Kiểm tra Dữ liệu:
+
+Đảm bảo rằng dữ liệu đã được lưu đúng định dạng và có thể tải lại mà không gặp lỗi.
+Đào tạo Mô hình:
+
+Nếu bạn chưa có mã cho phần đào tạo mô hình, hãy viết mã để xây dựng và đào tạo mô hình với dữ liệu đã được xử lý.
+Lựa chọn mô hình phù hợp (ví dụ: CNN cho bài toán phân loại ảnh) và xác định các tham số như learning rate, batch size, epochs.
+Đánh giá Mô hình:
+
+Sau khi đào tạo, bạn nên đánh giá mô hình của mình bằng cách sử dụng tập kiểm tra.
+Sử dụng các chỉ số đánh giá như accuracy, precision, recall, F1 score để xác định hiệu suất của mô hình.
+Tuning và Tối ưu hóa:
+
+Nếu cần thiết, bạn có thể tinh chỉnh mô hình (hyperparameter tuning) để cải thiện hiệu suất.
+Xem xét các phương pháp như regularization hoặc dropout để giảm thiểu overfitting.
+Triển khai Mô hình:
+
+Nếu bạn muốn sử dụng mô hình đã được đào tạo trong ứng dụng thực tế, bạn có thể triển khai nó vào môi trường sản xuất.
+Sử dụng các framework như Flask hoặc FastAPI để tạo API cho mô hình của bạn.
+Ghi Chép và Tài Liệu:
+
+Ghi chép lại quy trình của bạn, các quyết định đã thực hiện và kết quả đạt được. Điều này sẽ hữu ích cho việc báo cáo hoặc cho các dự án trong tương lai.
+Xem xét Kết quả:
+
+So sánh kết quả mô hình của bạn với các phương pháp khác hoặc các mô hình trước đó để thấy được tiến bộ.
