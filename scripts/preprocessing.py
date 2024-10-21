@@ -314,7 +314,7 @@ class DataProcessor:
         else:
             augmented_train_data, augmented_train_images = train_data, train_images
 
-        augmented_train_data = pd.DataFrame(augmented_train_data)
+        augmented_train_data = pd.DataFrame(augmented_train_data).reset_index(drop=True)
         # Split augmented data into features and labels
         train_data_features = augmented_train_data.drop(columns=['dx_code'])
         train_data_labels = augmented_train_data['dx_code']
