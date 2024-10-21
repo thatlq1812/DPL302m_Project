@@ -22,13 +22,13 @@ data:
 # Hyperparameters
 hyperparameters:
   epochs: 1
-  n_workers: 12
-  batch_size: 8
+  n_workers: 16
+  batch_size: 32
   learning_rate: 0.001
   test_size: 0.2
   random_state: 42
   num_classes: 7
-  feature_extract: True
+  feature_extract: False
   use_pretrained: True
   ###
   # DenseNet121
