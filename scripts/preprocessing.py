@@ -9,7 +9,7 @@ import numpy as np
 import albumentations as A
 from tqdm import tqdm
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+from sklearn.preprocessing import LabelEncoder
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from torchvision import transforms
 
@@ -25,10 +25,15 @@ class DataProcessor:
         self.batch_size = self.config['hyperparameters']['batch_size']
         self.n_workers = multiprocessing.cpu_count()
         
-    def load_raw_data(self):
+    def load_raw_data(self, rate=1):
         """Read the raw data from the CSV file."""
         raw_csv_path = self.config['data']['raw_csv_path']
         self.data = pd.read_csv(raw_csv_path)
+
+        # Chỉ lấy một phần dữ liệu để xử lý nhanh hơn
+        self.data = self.data.sample(frac=rate, random_state=42)
+        print('Raw data shape:', self.data.shape)
+
 
     def data_check(self):
         """Check the data for potential issues."""
@@ -101,15 +106,15 @@ class DataProcessor:
         label_encoder_sex = LabelEncoder()
         self.data['sex_code'] = label_encoder_sex.fit_transform(self.data['sex'])
         
-        label_encoder_localization = LabelEncoder()
-        self.data['localization_code'] = label_encoder_localization.fit_transform(self.data['localization'])
+        #label_encoder_localization = LabelEncoder()
+        #self.data['localization_code'] = label_encoder_localization.fit_transform(self.data['localization'])
 
         """Save the label encoders to a file."""
         self.label_encoders = {
             'dx': label_encoder_dx,
             'dx_type': label_encoder_dx_type,
             'sex': label_encoder_sex,
-            'localization': label_encoder_localization
+            #'localization': label_encoder_localization
         }
         encoder_file_name = self.config['encoder']['path'] + str(self.config['preprocessing']['resize'][0]) + 'x' + str(self.config['preprocessing']['resize'][1]) + '.pt'
         torch.save(self.label_encoders, encoder_file_name)
@@ -267,6 +272,10 @@ class DataProcessor:
         # Convert images to tensors
         augmented_images = [self.convert_to_tensor(image) for image in images]
 
+        # Stack all images into a single tensor
+        augmented_images = torch.stack(augmented_images)
+
+        # Stack all data into a single tensor
         # Compute mean and standard deviation
         norm_mean, norm_std = self.compute_img_mean_std(images)
         norm_mean = torch.tensor(norm_mean)
@@ -274,23 +283,23 @@ class DataProcessor:
 
         # Create file paths
         suffix = str(self.resize_shape[0]) + 'x' + str(self.resize_shape[1]) + '_' + file_suffix
-        norm_file_path = os.path.join(self.config['data']['processed_path'], f"norm_mean_std{suffix}.pt")
-        data_path = os.path.join(self.config['data']['processed_path'], f'HAM10000_{suffix}.pt')
-        images_path = os.path.join(self.config['data']['processed_images_path'], f'images_{suffix}.pt')
+        file_path = os.path.join(self.config['data']['processed_path'], f'HAM10000_{suffix}.pt')
 
-        # If the directories don't exist, create them
-        os.makedirs(os.path.dirname(data_path), exist_ok=True)  # Create directory for data
-        os.makedirs(os.path.dirname(images_path), exist_ok=True)  # Create directory for images
+        # If the directory doesn't exist, create it
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)  # Create directory for data
 
-        # Save
-        torch.save(data, data_path)
-        torch.save(augmented_images, images_path)
-        torch.save({'mean': norm_mean, 'std': norm_std}, norm_file_path)
+        # Save all data in a single file
+        torch.save({
+            'data': data,
+            'images': augmented_images,
+            'mean': norm_mean,
+            'std': norm_std
+        }, file_path)
 
-    def run(self):
+    def run(self, aug=True, rate=1):
         """Main - Run the data processing pipeline."""
         start_time = time.time()
-        self.load_raw_data()
+        self.load_raw_data(rate)
         self.data_check()
         self.data_cleaning()
         self.drop_unnecessary_columns()
@@ -299,21 +308,33 @@ class DataProcessor:
         test_images = self.load_images(test_data)
 
         augmentation_counts = self.type_count(train_data, self.config['preprocessing']['augmentation']['ratio'])
-        augmented_train_data, augmented_train_images = self.augment_images(train_data, train_images, augmentation_counts)
-        print('Augmented train data shape:', augmented_train_data.shape)
-        print('Augmented train images shape:', len(augmented_train_images))
-        print('Raw test data shape:', test_data.shape)
         
+        if aug:
+            augmented_train_data, augmented_train_images = self.augment_images(train_data, train_images, augmentation_counts)
+        else:
+            augmented_train_data, augmented_train_images = train_data, train_images
+
+        augmented_train_data = pd.DataFrame(augmented_train_data)
+        # Split augmented data into features and labels
+        train_data_features = augmented_train_data.drop(columns=['dx_code'])
+        train_data_labels = augmented_train_data['dx_code']
+        test_data_labels = test_data['dx_code']
+        print('Augmented train data shape:', augmented_train_data.shape)
+        print('Augmented train images shape:', augmented_train_images[0].shape)
+        print("Train data labels shape:", train_data_labels.shape)
+        print('Raw test data shape:', test_data.shape)
+
         print("Saving data...")
-        self.save_data(augmented_train_data, augmented_train_images, 'train')
-        self.save_data(test_data, test_images, 'test')
-        print('Data saved successfully.')
+        print("Saving train data...")
+        self.save_data(train_data_labels, augmented_train_images, 'train')
+        print("Saving test data...")
+        self.save_data(test_data_labels, test_images, 'test')
         print('Data preprocessing completed in', round(time.time() - start_time, 2), 'seconds.')
         
 
 if __name__ == "__main__":
     processor = DataProcessor(config_path='config.yaml')
-    processor.run()
+    processor.run(aug=True)
 
 """
 Giải thích cấu trúc:

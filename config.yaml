@@ -21,31 +21,39 @@ data:
 
 # Hyperparameters
 hyperparameters:
-  epochs: 50
+  epochs: 1
+  n_workers: 8
   batch_size: 32
   learning_rate: 0.001
   test_size: 0.2
   random_state: 42
   num_classes: 7
   feature_extract: False
+  use_pretrained: True
+  ###
+  # DenseNet121
+  # More
+  ###
+  model_name: "Densenet121"
 
 
 # Preprocessing configuration
 preprocessing:
+  augmentation_choose: False
   augmentation:
     ratio: 1
+  # resize: !!seq [16, 16]
+  # resize: !!seq [32, 32]
+  # resize: !!seq [64, 64]
+  # resize: !!seq [128, 128]
   resize: !!seq [224, 224]
+  # resize: !!seq [256, 256]
+  # resize: !!seq [299, 299]
+  #
   desired_total: 20000
 
 
 # Training configuration
-
-processor:
-  n_workers: 16
-  batch_size: 32
-  test_size: 0.2
-  random_state: 42
-  
 # Encoder location
 encoder:
   path: "encoder/"
